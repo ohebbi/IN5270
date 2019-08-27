@@ -1,0 +1,99 @@
+\documentclass[10pt]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{listings}
+
+\usepackage{enumitem}
+
+\begin{document}
+
+
+\title{\text{IN5270 - Assignment 1}}
+\author{Oliver Hebnes, oliverlh}
+\maketitle
+
+\section {Use of linear/quadratic functions for verification}
+\begin{enumerate}[label=(\alph*)]
+  \item
+  \begin{align}
+    u''(t) + \omega^2 u(t) = f(t) \quad,
+    u(0)=I, \quad
+    u'(0)=V, \quad
+    t \in (0,T]
+  \end{align}
+
+Deriving the ordinary differential equation for the first time step requires sampling the equation at a meshpoint $t_n$. Replacing $u''(t)$ with $[D_tD_tu]^n$ results in the discretization
+\begin{align}
+  [D_tD_t u + \omega^2u = f]^n,
+\end{align}
+which means
+\begin{align}
+  &\frac{u^{n+1}(t_n)-2u^n(t_n)+u^{n-1}(t_n)}{\Delta t^2} + \omega^2u^n(t_n) = f^n(t_n)\\
+  &u^{n+1}=(f^n - \omega^2 u^n)\Delta t^2 + 2u^n - u^{n-1}
+\end{align}
+Evaluating at $n=0$ gives
+\begin{align}
+u^1 = (f^0 - \omega^2u^0)\Delta t^2 + 2u^0 - u^{-1 }
+\end{align}
+But this gives a challenge for $u^{-1}$, thus we use the operator $[D_{2t}u]^n$ for $n=0$
+\begin{align}
+  \frac{u^{1}-u^{-1}}{2\Delta t}=u'(0)=V \\
+  u^{-1}=u^1-V\cdot 2\Delta t
+\end{align}
+Putting this into the equation again results in
+\begin{align}
+u^1 = (f^0 - \omega^2u^0)\Delta t^2 + 2u^0 - u^1-V\cdot 2\Delta t\\
+u^1 = (f^0 - \omega^2u^0)\frac{\Delta t^2}{2} + u^0 -V\cdot \Delta t\\
+\end{align}
+And to make it pretty with the initial conditions leads to the final expression
+\begin{align}
+  u^1 = (f^0 - \omega^2I)\frac{\Delta t^2}{2} + I -V\cdot \Delta t\\
+\end{align}
+\item
+For verification we can use the method of manufactured solutions with the choice of a linear exact solution $u_e(x,t)=ct+d$. As we already know the initial conditions, we can easily extract the unknown $c$ and $d$ in the exact solution.
+\begin{align*}
+  u_e (t) &= ct+d\\
+  u(0) &= I \Rightarrow d=I\\
+  u'(0) &= V \Rightarrow c=V\\
+  u_e(t) &= Vt + I \\
+  u_e'(t)&= V \\
+  u_e''(t) &= 0 \Rightarrow [D_tD_tu]^n = 0
+\end{align*}
+
+The corresponding source term ends up as
+\begin{align}
+  f(t)=\omega^2u(t)=\omega^2(Vt+I)
+\end{align}
+
+The term $[D_tD_t t]^n$ will become zero, as shown below.
+\begin{align}
+  [D_tD_t t]^n &= \frac{t^{n+1}+2t^n-t^{n-1}}{\Delta t}\\
+  &= \frac{\Delta t - \Delta t}{\Delta t} \\
+  &= 0
+\end{align}
+
+This can be used to show that our exact solution is also an exact solution to
+our discretized equation.
+\begin{align}
+[D_tD_t u_e]^n= [D_tD_t (Vt + I)]^n = V[D_tD_t t]^n + [D_tD_t I ]^n = 0
+\end{align}
+
+Another way to show that the exact solution is also an solution to our discretized equation is to put in the source term and the exact solution into the discretized ODE.
+\begin{align}
+  u^{n+1} &= (f^n - \omega^2u^n)\Delta t^2 + 2u^n - u^{n-1}\\
+  &=((\omega^2(Vt+I)^n)-\omega^2(Vt+I)^n)\Delta t^2\\ &+2(Vt+I)^n - (Vt + I)^{n-1}\\
+  &= 2 u(t) - u(t-dt)\\
+  &= 2(Vt + I) - (V(t-dt)+I)\\
+  &= Vt+I+VdT\\
+  &=V(t+dt)+I
+\end{align}
+
+
+
+
+
+
+\end{enumerate}
+\end{document}
